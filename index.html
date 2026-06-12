@@ -3,17 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>マイホームページ</title>
+    <title>リアルタイムセンサーモニター</title>
     <style>
         body { font-family: sans-serif; text-align: center; padding-top: 50px; background-color: #f0f2f5; }
-        h1 { color: #333; }
-        .box { background: white; padding: 20px; display: inline-block; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .box { background: white; padding: 30px; display: inline-block; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .value { font-size: 64px; color: #ff5722; font-weight: bold; margin: 20px 0; }
     </style>
 </head>
 <body>
     <div class="box">
-        <h1>GitHubでサイト作成成功！</h1>
-        <p>スマホからこの画面が見えています。</p>
+        <h1>現在のセンサー値</h1>
+        <div class="value" id="sensor-val">---</div>
+        <p>（5秒ごとに自動更新中）</p>
     </div>
+
+    <script>
+        const channelId = "12345"; // ★自分のチャネルIDに変える
+        const readKey = "YOUR_READ_KEY"; // ★自分のリードキーに変える
+        const url = `https://ambidata.io/api/v1/channels/${channelId}/data?readKey=${readKey}&num=1`;
+
+        function fetchValue() {
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if(data && data.length > 0) {
+                        // d1のデータを画面に表示
+                        document.getElementById('sensor-val').innerText = data[0].d1;
+                    }
+                })
+                .catch(err => console.error("データ取得エラー:", err));
+        }
+
+        // ページが開いたときと、その後5秒ごとにデータを読み込みに行く
+        fetchValue();
+        setInterval(fetchValue, 5000);
+    </script>
 </body>
 </html>
